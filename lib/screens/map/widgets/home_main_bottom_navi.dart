@@ -33,32 +33,38 @@ class _HomeMainBottomNaviState extends State<HomeMainBottomNavi> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            BottomNaviMenu(
-              naviIcon: FontAwesomeIcons.houseChimney,
-              naviText: 'Map',
-              naviTap: () => widget.bottomNaviTap(0),
-              // naviTap: () => _naviTap(0),
+            GestureDetector(
+              onTap: () => widget.bottomNaviTap(0),
+              child: const BottomNaviMenu(
+                naviIcon: FontAwesomeIcons.houseChimney,
+                naviText: 'Map',
+                // naviTap: () => _naviTap(0),
+              ),
             ),
-            BottomNaviMenu(
-              naviIcon: FontAwesomeIcons.magnifyingGlass,
-              naviText: 'Rooms',
-              naviTap: () => widget.bottomNaviTap(1),
+            GestureDetector(
+              onTap: () => widget.bottomNaviTap(1),
+              child: const BottomNaviMenu(
+                naviIcon: FontAwesomeIcons.magnifyingGlass,
+                naviText: 'Rooms',
 
-              // naviTap: () => _naviTap(1),
+                // naviTap: () => _naviTap(1),
+              ),
             ),
             const NaviAddBtn(),
-            BottomNaviMenu(
-              naviIcon: FontAwesomeIcons.message,
-              naviText: 'Chats',
-              naviTap: () => widget.bottomNaviTap(3),
-
-              // naviTap: () => _naviTap(3),
+            GestureDetector(
+              onTap: () => widget.bottomNaviTap(3),
+              child: const BottomNaviMenu(
+                naviIcon: FontAwesomeIcons.message,
+                naviText: 'Chats',
+              ),
             ),
-            BottomNaviMenu(
-              naviIcon: FontAwesomeIcons.user,
-              naviText: 'Profile',
-              naviTap: () => widget.bottomNaviTap(4),
-              // naviTap: () => _naviTap(4),
+            GestureDetector(
+              onTap: () => widget.bottomNaviTap(4),
+              child: const BottomNaviMenu(
+                naviIcon: FontAwesomeIcons.user,
+                naviText: 'Profile',
+                // naviTap: () => _naviTap(4),
+              ),
             ),
           ],
         ),

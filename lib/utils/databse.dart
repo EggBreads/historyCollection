@@ -11,6 +11,7 @@ class SharedPrefs {
 
   Future<void> init() async {
     _sharedPrefs = await SharedPreferences.getInstance();
+    await _sharedPrefs.clear();
   }
 
   SharedPreferences get getSharedPrefs => _sharedPrefs;

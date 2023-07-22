@@ -53,6 +53,7 @@ dependencies:
   chat_bubbles: ^1.4.1
   shared_preferences: ^2.1.2
   flutter_riverpod: ^2.3.6
+  image: ^4.0.17
 
 dev_dependencies:
   flutter_test:

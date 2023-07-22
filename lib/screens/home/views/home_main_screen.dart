@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:historycollection/screens/area/area_screen.dart';
+import 'package:historycollection/screens/area/views/area_screen.dart';
 import 'package:historycollection/screens/map/views/home_map_screen.dart';
 import 'package:historycollection/screens/map/widgets/home_main_bottom_navi.dart';
 import 'package:historycollection/screens/profile/views/profile_screen.dart';
@@ -30,6 +30,7 @@ class _HomeMainScreenState extends State<HomeMainScreen> {
 
   void _bottomNaviTap(int idx) {
     context.go("/${_mains[idx]}");
+    print(idx);
     setState(() {
       _curHomeScreenIdx = idx;
       // _naviPush();

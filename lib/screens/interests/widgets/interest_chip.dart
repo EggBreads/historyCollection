@@ -60,7 +60,8 @@ class _InterestChipState extends State<InterestChip>
       _animationController.forward();
     }
 
-    widget.updateItemFn(widget.title, _animationController.isCompleted);
+    // widget.updateItemFn(widget.idx, _animationController.isCompleted);
+    widget.updateItemFn(widget.idx);
   }
 
   @override

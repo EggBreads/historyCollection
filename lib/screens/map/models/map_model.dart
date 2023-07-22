@@ -5,25 +5,25 @@ import 'package:historycollection/screens/map/models/map_position_model.dart';
 import 'package:historycollection/screens/map/models/marker_model.dart';
 
 class MapModel {
-  List<MarkerModel> markerModel;
+  List<MarkerModel> markerList;
   MapPosition mapPosition;
 
   MapModel({
-    required this.markerModel,
+    required this.markerList,
     required this.mapPosition,
   });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'markerModel': markerModel.map((x) => x.toMap()).toList(),
+      'markerList': markerList.map((x) => x.toMap()).toList(),
       'mapPosition': mapPosition.toMap(),
     };
   }
 
   factory MapModel.fromMap(Map<String, dynamic> map) {
     return MapModel(
-      markerModel: List<MarkerModel>.from(
-        (map['markerModel'] as List<int>).map<MarkerModel>(
+      markerList: List<MarkerModel>.from(
+        (map['markerList'] as List<dynamic>).map<MarkerModel>(
           (x) => MarkerModel.fromMap(x as Map<String, dynamic>),
         ),
       ),

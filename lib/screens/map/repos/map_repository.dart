@@ -24,7 +24,17 @@ class MapRepository {
   }
 
   void setMarkers(MarkerModel model) {
-    List<String> strMarkers = _preferences.getStringList(storageMarkersKey)!;
+    List<String>? strMarkers = _preferences.getStringList(storageMarkersKey);
+
+    if (strMarkers == null) {
+      _preferences.setStringList(
+        storageMarkersKey,
+        [
+          model.toJson(),
+        ],
+      );
+      return;
+    }
 
     _preferences.setStringList(
       storageMarkersKey,
@@ -43,6 +53,16 @@ class MapRepository {
   }
 
   void setThisPosition(MapPosition position) {
+    String? strPosition = _preferences.getString(storagePositionKey);
+    if (strPosition == null) {
+      _preferences.setString(
+        storagePositionKey,
+        position.toJson(),
+      );
+      return;
+    }
+
+    strPosition = position.toJson();
     _preferences.setString(
       storagePositionKey,
       position.toJson(),
@@ -50,7 +70,13 @@ class MapRepository {
   }
 
   MapPosition get getThisPosition {
-    String strPosition = _preferences.getString(storagePositionKey)!;
+    String? strPosition = _preferences.getString(storagePositionKey);
+    if (strPosition == null || strPosition.isEmpty) {
+      return MapPosition(
+        lat: 37.7189623,
+        lng: 127.1628922,
+      );
+    }
 
     return MapPosition.fromJson(
       strPosition,

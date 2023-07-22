@@ -1,21 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:historycollection/Constants/gaps.dart';
-import 'package:historycollection/Constants/insertest_itmes.dart';
 import 'package:historycollection/Constants/sizes.dart';
-import 'package:historycollection/screens/interest/widgets/interest_chip.dart';
+import 'package:historycollection/screens/interests/models/interests_model.dart';
+import 'package:historycollection/screens/interests/view_models/interests_view_model.dart';
+import 'package:historycollection/screens/interests/widgets/interest_chip.dart';
 import 'package:historycollection/screens/profile/widgets/profile_sliver_box.dart';
 import 'package:historycollection/utils/app_theme.dart';
 
-class InterestScreen extends StatefulWidget {
+class InterestScreen extends ConsumerStatefulWidget {
   const InterestScreen({super.key});
 
   @override
-  State<InterestScreen> createState() => _InterestScreenState();
+  ConsumerState<InterestScreen> createState() => InterestScreenState();
 }
 
-class _InterestScreenState extends State<InterestScreen>
+class InterestScreenState extends ConsumerState<InterestScreen>
     with TickerProviderStateMixin {
   final GlobalKey<SliverAnimatedGridState> _gAnimatedtKey =
       GlobalKey<SliverAnimatedGridState>();
@@ -29,12 +31,12 @@ class _InterestScreenState extends State<InterestScreen>
     ),
   );
 
-  List<String> _selectedItmes = [];
+  // List<String> _selectedItmes = [];
 
   bool _showBarrier = false;
 
   // 임시
-  InterestItems ii = InterestItems();
+  // InterestItems ii = InterestItems();
 
   late final Animation<Color?> _barrierAnimation = ColorTween(
     begin: Colors.transparent,
@@ -46,11 +48,11 @@ class _InterestScreenState extends State<InterestScreen>
     // TODO: implement initState
     super.initState();
     // if (selectedItmes.isEmpty) {
-    if (ii.selectedInterests.isNotEmpty) {
-      _selectedItmes = ii.selectedInterests;
-    } else {
-      _selectedItmes = [];
-    }
+    // if (ii.selectedInterests.isNotEmpty) {
+    //   _selectedItmes = ii.selectedInterests;
+    // } else {
+    //   _selectedItmes = [];
+    // }
     // }
   }
 
@@ -58,50 +60,77 @@ class _InterestScreenState extends State<InterestScreen>
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    _selectedItmes = [];
+    // _selectedItmes = [];
   }
 
-  bool _chkInterItem(int idx) {
-    // any 전체중하나
-    // every 전체가 조건에 충족
-    return _selectedItmes.any((selectedItem) {
-      return selectedItem == ii.allInterests[idx];
-    });
+  bool _chkInterItem(List<InterestModel> myInterest, InterestModel interest) {
+    return myInterest
+        .where((i) {
+          return i.seqNo == interest.seqNo;
+        })
+        .toList()
+        .isNotEmpty;
+    // return false;
   }
 
-  void updateItemFn(String item, bool isChk) {
-    setState(() {
-      // print('TEST11 => ${item}');
-      // print('TEST11 => ${item.contains(widget.title)}');
-      if (isChk) {
-        if (!_selectedItmes.contains(item)) {
-          _selectedItmes.add(item);
-        }
-      } else {
-        if (_selectedItmes.contains(item)) {
-          _selectedItmes.remove(item);
-        }
+  Future<void> updateItemFn(int seqNo) async {
+    final provider = ref.read(interestsProvider.notifier);
+
+    List<InterestModel> interests = await provider.getInerests();
+    List<InterestModel> list = await provider.getMyInterest();
+
+    List<InterestModel> findInterest =
+        list.where((i) => i.seqNo == seqNo).toList();
+    // 삭제
+    if (findInterest.isNotEmpty) {
+      list = (await provider.getMyInterest())
+          .where((i) => i.seqNo != seqNo)
+          .toList();
+
+      await provider.removeMyInterest();
+
+      for (var item in list) {
+        await provider.setMyInterest(item);
       }
-    });
+    } else {
+      List<InterestModel> interest =
+          interests.where((i) => i.seqNo == seqNo).toList();
+
+      await provider.removeMyInterest();
+
+      list = [...list, ...interest];
+
+      for (var item in list) {
+        await provider.setMyInterest(item);
+      }
+    }
+
+    setState(() {});
   }
 
-  void _onTapSave() {
-    // 임시
+  void _onTapSave() async {
+    final provider = ref.read(interestsProvider.notifier);
+
+    List<InterestModel> list = await provider.getInerests();
+
     if (_showBarrier) {
       // 임시
       if (_textEditingController.value.text.isNotEmpty) {
         //검사
-        List<String> findInterests = ii.allInterests.where(
-          (interest) {
-            return interest == _textEditingController.value.text;
+        final interest = _textEditingController.value.text;
+
+        list = list.where(
+          (item) {
+            return item.title == interest;
           },
         ).toList();
-        if (findInterests.isEmpty) {
-          ii.allInterests.add(_textEditingController.value.text);
+
+        if (list.isEmpty) {
+          provider.setInterests(
+            InterestModel(seqNo: list.length + 1, title: interest),
+          );
         }
       }
-    } else {
-      // selected item 저장
     }
 
     _showBarrier = false;
@@ -119,6 +148,10 @@ class _InterestScreenState extends State<InterestScreen>
   Widget build(BuildContext context) {
     final isDark = isDarkMod(context);
     final size = MediaQuery.of(context).size;
+
+    final provider = ref.watch(interestsProvider);
+    final myProvider = ref.watch(myInterestsProvider);
+
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -203,28 +236,37 @@ class _InterestScreenState extends State<InterestScreen>
                         ],
                       ),
                     ),
-                    SliverGrid.builder(
-                      key: _gAnimatedtKey,
-                      itemCount: ii.allInterests.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        // childAspectRatio: 0.5 / 0.5,
-                        mainAxisSpacing: Sizes.size5,
-                        crossAxisSpacing: Sizes.size5,
-                        mainAxisExtent: Sizes.size44,
+                    if ((!provider.isLoading || provider.isReloading) &&
+                        !myProvider.isLoading)
+                      SliverGrid.builder(
+                        key: _gAnimatedtKey,
+                        itemCount: provider.value!.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          // childAspectRatio: 0.5 / 0.5,
+                          mainAxisSpacing: Sizes.size5,
+                          crossAxisSpacing: Sizes.size5,
+                          mainAxisExtent: Sizes.size44,
+                        ),
+                        itemBuilder: (context, index) {
+                          final interest = provider.value![index];
+                          return InterestChip(
+                            // animation: animation,
+                            idx: interest.seqNo,
+                            title: interest.title,
+                            selected: myProvider.value == null ||
+                                    myProvider.value!.isEmpty
+                                ? false
+                                : _chkInterItem(
+                                    myProvider.value!,
+                                    interest,
+                                  ),
+                            // selectedItems: _selectedItmes,
+                            updateItemFn: updateItemFn,
+                          );
+                        },
                       ),
-                      itemBuilder: (context, index) {
-                        return InterestChip(
-                          // animation: animation,
-                          idx: index,
-                          title: ii.allInterests[index],
-                          selected: _chkInterItem(index),
-                          // selectedItems: _selectedItmes,
-                          updateItemFn: updateItemFn,
-                        );
-                      },
-                    ),
                   ],
                 ),
               ),

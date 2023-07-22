@@ -10,33 +10,28 @@ class BottomNaviMenu extends StatelessWidget {
     Key? key,
     required this.naviIcon,
     required this.naviText,
-    required this.naviTap,
   }) : super(key: key);
 
   final IconData naviIcon;
   final String naviText;
-  final Function naviTap;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => naviTap(),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FaIcon(
-            naviIcon,
-            color: Theme.of(context).colorScheme.primary,
-            size: Sizes.size20,
-          ),
-          Gaps.v10,
-          Text(
-            naviText,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FaIcon(
+          naviIcon,
+          color: Theme.of(context).colorScheme.primary,
+          size: Sizes.size20,
+        ),
+        Gaps.v10,
+        Text(
+          naviText,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+      ],
     );
   }
 }
