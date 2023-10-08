@@ -3,28 +3,24 @@ import 'dart:convert';
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class ChatContentModel {
   String text;
-  bool isSender;
-  bool isReciver;
+  String senderEmail;
 
   ChatContentModel({
     required this.text,
-    required this.isSender,
-    required this.isReciver,
+    required this.senderEmail,
   });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'text': text,
-      'isSender': isSender,
-      'isReciver': isReciver,
+      'senderEmail': senderEmail,
     };
   }
 
   factory ChatContentModel.fromMap(Map<String, dynamic> map) {
     return ChatContentModel(
       text: map['text'] as String,
-      isSender: map['isSender'] as bool,
-      isReciver: map['isReciver'] as bool,
+      senderEmail: map['senderEmail'] as String,
     );
   }
 

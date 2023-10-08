@@ -30,7 +30,7 @@ class _HomeMainScreenState extends State<HomeMainScreen> {
 
   void _bottomNaviTap(int idx) {
     context.go("/${_mains[idx]}");
-    print(idx);
+
     setState(() {
       _curHomeScreenIdx = idx;
       // _naviPush();
@@ -39,14 +39,12 @@ class _HomeMainScreenState extends State<HomeMainScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    print("test $_curHomeScreenIdx");
+    // print("test $_curHomeScreenIdx");
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -81,6 +79,7 @@ class _HomeMainScreenState extends State<HomeMainScreen> {
       ),
       bottomNavigationBar: HomeMainBottomNavi(
         bottomNaviTap: _bottomNaviTap,
+        selectedTabIdx: _curHomeScreenIdx,
       ),
     );
   }

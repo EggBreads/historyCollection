@@ -33,14 +33,12 @@ class _InterestChipState extends State<InterestChip>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _initOpacity();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _animationController.dispose();
     super.dispose();
   }

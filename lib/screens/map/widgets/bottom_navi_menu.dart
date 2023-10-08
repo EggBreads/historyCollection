@@ -10,10 +10,12 @@ class BottomNaviMenu extends StatelessWidget {
     Key? key,
     required this.naviIcon,
     required this.naviText,
+    required this.isNaviTab,
   }) : super(key: key);
 
   final IconData naviIcon;
   final String naviText;
+  final bool isNaviTab;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,9 @@ class BottomNaviMenu extends StatelessWidget {
       children: [
         FaIcon(
           naviIcon,
-          color: Theme.of(context).colorScheme.primary,
+          color: isNaviTab
+              ? Theme.of(context).colorScheme.primary
+              : Colors.white60,
           size: Sizes.size20,
         ),
         Gaps.v10,

@@ -8,9 +8,11 @@ class HomeMainBottomNavi extends StatefulWidget {
   const HomeMainBottomNavi({
     super.key,
     required this.bottomNaviTap,
+    required this.selectedTabIdx,
   });
 
   final Function bottomNaviTap;
+  final int selectedTabIdx;
 
   @override
   State<HomeMainBottomNavi> createState() => _HomeMainBottomNaviState();
@@ -27,7 +29,7 @@ class _HomeMainBottomNaviState extends State<HomeMainBottomNavi> {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: Sizes.size10,
+          horizontal: Sizes.size20,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,17 +37,18 @@ class _HomeMainBottomNaviState extends State<HomeMainBottomNavi> {
           children: [
             GestureDetector(
               onTap: () => widget.bottomNaviTap(0),
-              child: const BottomNaviMenu(
+              child: BottomNaviMenu(
                 naviIcon: FontAwesomeIcons.houseChimney,
                 naviText: 'Map',
-                // naviTap: () => _naviTap(0),
+                isNaviTab: widget.selectedTabIdx == 0,
               ),
             ),
             GestureDetector(
               onTap: () => widget.bottomNaviTap(1),
-              child: const BottomNaviMenu(
+              child: BottomNaviMenu(
                 naviIcon: FontAwesomeIcons.magnifyingGlass,
                 naviText: 'Rooms',
+                isNaviTab: widget.selectedTabIdx == 1,
 
                 // naviTap: () => _naviTap(1),
               ),
@@ -53,16 +56,19 @@ class _HomeMainBottomNaviState extends State<HomeMainBottomNavi> {
             const NaviAddBtn(),
             GestureDetector(
               onTap: () => widget.bottomNaviTap(3),
-              child: const BottomNaviMenu(
+              child: BottomNaviMenu(
                 naviIcon: FontAwesomeIcons.message,
                 naviText: 'Chats',
+                isNaviTab: widget.selectedTabIdx == 3,
               ),
             ),
             GestureDetector(
               onTap: () => widget.bottomNaviTap(4),
-              child: const BottomNaviMenu(
+              child: BottomNaviMenu(
                 naviIcon: FontAwesomeIcons.user,
                 naviText: 'Profile',
+                isNaviTab: widget.selectedTabIdx == 4,
+
                 // naviTap: () => _naviTap(4),
               ),
             ),

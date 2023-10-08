@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:historycollection/Constants/sizes.dart';
@@ -109,7 +110,6 @@ class _NetworkScreensState extends State<NetworkScreens>
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _transformationController.dispose();
     _animationCtrl.dispose();
     super.dispose();
@@ -255,7 +255,9 @@ class _NetworkScreensState extends State<NetworkScreens>
                       // boundaryMargin: const EdgeInsets.all(double.infinity),
                       scaleEnabled: true,
                       onInteractionEnd: (s) {
-                        print("Test1 ${_transformationController.value}");
+                        if (kDebugMode) {
+                          print("Test1 ${_transformationController.value}");
+                        }
                       },
                       child: GraphView(
                         graph: graph,

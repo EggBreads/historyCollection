@@ -2,8 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:historycollection/Constants/gaps.dart';
+import 'package:historycollection/Constants/router_constraint.dart';
 import 'package:historycollection/Constants/sizes.dart';
+import 'package:historycollection/screens/home/view_models/auth_view_model.dart';
 import 'package:historycollection/screens/settings/view_models/settings_view_model.dart';
 import 'package:historycollection/utils/app_theme.dart';
 
@@ -15,17 +18,12 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class SettingsScreenState extends ConsumerState<SettingsScreen> {
-  // bool _notification = false;
-
-  // void _onNotificationChanged(bool? newValue) {
-  //   if (newValue == null) {
-  //     return;
-  //   }
-
-  //   setState(() {
-  //     _notification = newValue;
-  //   });
-  // }
+  Future<void> _loginOut(BuildContext context) async {
+    await ref.read(authProvider.notifier).signOut();
+    if (mounted) {
+      context.go(RouterPathAndNameConstraint.loginRoutePATH);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +98,7 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: Padding(
           padding: EdgeInsets.zero,
           child: CupertinoButton.filled(
-            onPressed: () {},
+            onPressed: () => _loginOut(context),
             child: Text(
               "로그아웃",
               textAlign: TextAlign.center,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -26,14 +27,13 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   // @override
   // void initState() {
-  //   // TODO: implement initState
+  //
   //   super.initState();
   //   _initController();
   // }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -44,7 +44,9 @@ class ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   void _onTapInterest() {
-    print("sdfsdfsdf");
+    if (kDebugMode) {
+      print("sdfsdfsdf");
+    }
     context.push(
       RouterPathAndNameConstraint.interestRoutePATH,
     );

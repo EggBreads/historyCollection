@@ -1,14 +1,25 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:historycollection/firebase_options.dart';
 import 'package:historycollection/utils/databse.dart';
 import 'package:historycollection/utils/router_config.dart';
+import 'package:historycollection/webrtc/service/webrtc_service.dart';
+// import 'package:historycollection/webrtc/service/webrtc_module.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+    // options: DefaultFirebaseOptions.android,
+  );
+
   await SharedPrefs().init();
+
+  await WebrtcService().connectSocket();
 
   runApp(
     const ProviderScope(
@@ -17,19 +28,25 @@ void main() async {
   );
 }
 
-class App extends StatefulWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  State<App> createState() => _AppState();
+  ConsumerState<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> {
+class _AppState extends ConsumerState<App> {
   // This widget is the root of your application.
+  @override
+  void initState() {
+    //IO.Socket socket;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      routerConfig: router,
+      routerConfig: ref.watch(routerProvider),
       themeMode: ThemeMode.system,
       theme: FlexThemeData.light(
         scheme: FlexScheme.gold,

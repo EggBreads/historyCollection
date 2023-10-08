@@ -7,8 +7,8 @@ class HomeTheme extends StatelessWidget {
   const HomeTheme({super.key});
 
   static const List<String> mainImages = [
-    "images/fall.jpeg",
-    "images/summer.jpeg",
+    "assets/images/fall.jpeg",
+    "assets/images/summer.jpeg",
   ];
 
   @override
@@ -24,8 +24,16 @@ class HomeTheme extends StatelessWidget {
           ),
         ),
         Gaps.v20,
-        const HomeThemes(
-          imgList: mainImages,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final maxHeight = constraints.maxHeight;
+            final maxWidth = constraints.maxWidth;
+            return HomeThemes(
+              imgList: mainImages,
+              maxHeight: maxHeight,
+              maxWidth: maxWidth,
+            );
+          },
         ),
         Gaps.v20,
         Text(

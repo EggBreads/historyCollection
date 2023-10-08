@@ -45,7 +45,6 @@ class InterestScreenState extends ConsumerState<InterestScreen>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     // if (selectedItmes.isEmpty) {
     // if (ii.selectedInterests.isNotEmpty) {
@@ -54,13 +53,6 @@ class InterestScreenState extends ConsumerState<InterestScreen>
     //   _selectedItmes = [];
     // }
     // }
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    // _selectedItmes = [];
   }
 
   bool _chkInterItem(List<InterestModel> myInterest, InterestModel interest) {

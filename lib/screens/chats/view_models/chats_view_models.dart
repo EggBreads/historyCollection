@@ -1,61 +1,84 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:historycollection/api/chats/chat_api_service.dart';
-import 'package:historycollection/screens/chats/models/chats_model.dart';
-import 'package:historycollection/screens/chats/models/chats_room_model.dart';
+import 'package:historycollection/screens/chats/models/chat_model.dart';
 import 'package:historycollection/screens/chats/repos/chats_repository.dart';
+import 'package:historycollection/screens/home/view_models/auth_view_model.dart';
+import 'package:historycollection/screens/rooms/models/room_model.dart';
+import 'package:historycollection/webrtc/providers/socket_client_provider.dart';
 
-class ChatsViewModels extends AutoDisposeAsyncNotifier<List<ChatsRoomModel>> {
-  final ChatsRepository _repository = ChatsRepository();
+class ChatsViewModels extends AutoDisposeAsyncNotifier<void> {
+  // late final ChatsRepository _repository;
 
-  Future<void> setRoomOnUser(ChatsRoomModel chatRoom) async {
-    // state = const AsyncLoading();
+  Future<void> sendChatMessage(RoomModel room, String message) async {
+    // ChatsRepository repository = ref.read(chatProvider(room.chatKey));
 
-    await _repository.setRoomOnUser(chatRoom);
+    final autoProvider = ref.read(authProvider.notifier);
 
-    // state = AsyncData(value)
+    final webrtcServiceRef = ref.read(webrtcServiceProvider);
+
+    final auth = autoProvider.getUserInfo;
+
+    if (auth == null) {
+      return;
+    }
+    // final chatRoom = _getChatRoom(room);
+
+    // const uuid = Uuid();
+
+    final chat = ChatModel(
+      message: message,
+      senderEmail: auth.userEmail ?? "",
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+      chatKey: room.chatKey,
+    );
+
+    // await repository.saveChatMessage(chat);
+
+    webrtcServiceRef.onSendChat(chat);
   }
 
-  @override
-  FutureOr<List<ChatsRoomModel>> build() async {
-    // TODO: implement build
-    // List<ChatsModel> chats = await ChatsApiService.getChatsItems();
-    // String nickName = await _repository.getNickName;
+  List<ChatModel> getChats(RoomModel room) {
+    final repository = ref.read(chatProvider(room.chatKey));
 
-    // return chats
-    //     .where(
-    //       (chat) => chat.userName == nickName,
-    //     )
-    //     .map((rooms) => rooms.chats)
-    //     .single;
-    final list = _repository.getChatsRoomList;
-    return _repository.getChatsRoomList;
-    // throw UnimplementedError();
+    return repository.getChats;
+  }
+
+  Future<void> saveChat(String chatKey, ChatModel chat) async {
+    ChatsRepository repository = ref.read(chatProvider(chatKey));
+    await repository.saveChatMessage(chat);
+  }
+
+  // Stream<List<ChatModel>> getChatStream(RoomModel room) async* {
+  //   // for (final chat in chats) {
+  //   while (true) {
+  //     await Future.delayed(const Duration(seconds: 1));
+  //     final chats = getChats(room);
+  //     chats.sort((a, b) => b.createdAt - a.createdAt);
+  //     yield chats;
+  //   }
+  //   // }
+  // }
+
+  // yield tempResult;
+
+  @override
+  FutureOr<void> build() async {
+    // _repository = ChatsRepository(chatKey: arg);
   }
 }
 
-final chatsProvider =
-    AutoDisposeAsyncNotifierProvider<ChatsViewModels, List<ChatsRoomModel>>(
+final chatsProvider = AutoDisposeAsyncNotifierProvider<ChatsViewModels, void>(
   () => ChatsViewModels(),
 );
 
-final roomsProvider = FutureProvider.autoDispose.family<void, String>(
-  (ref, nickName) async {
-    List<ChatsModel> chats = await ChatsApiService.getChatsItems(nickName);
+// final chatStreamProvider =
+//     StreamProvider.autoDispose.family<List<ChatModel>, String>((ref, params) {
+//   final chatRef = ref.read(chatsProvider.notifier);
+//   // final channel = WebSocketChannel.connect(
+//   //   // Uri.
+//   //   Uri.parse('ws://192.168.200.156:3005'),
+//   // );
 
-    final chatNotifier = ref.read(chatsProvider.notifier);
-
-    List<ChatsRoomModel> result = chats
-        .map(
-          (rooms) => rooms.chats,
-        )
-        .single;
-
-    for (var item in result) {
-      chatNotifier.setRoomOnUser(item);
-    }
-
-    // return result;
-  },
-);
+//   return chatRef.getChatStream(RoomModel.fromJson(params));
+// });

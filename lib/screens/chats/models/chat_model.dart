@@ -1,34 +1,37 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-
 import 'dart:convert';
 
-import 'package:historycollection/screens/chats/models/chat_content_model.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 
 class ChatModel {
-  final String uuid;
-  final bool isInvited;
-  final ChatContentModel contents;
+  final String chatKey;
+  final String message;
+  final String senderEmail;
+  final int createdAt;
 
   ChatModel({
-    required this.uuid,
-    required this.isInvited,
-    required this.contents,
+    required this.chatKey,
+    required this.message,
+    required this.senderEmail,
+    required this.createdAt,
   });
+
+  // final ChatContentModel contents;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'uuid': uuid,
-      'isInvited': isInvited,
-      'contents': contents.toMap(),
+      'chatKey': chatKey,
+      'message': message,
+      'senderEmail': senderEmail,
+      'createdAt': createdAt,
     };
   }
 
   factory ChatModel.fromMap(Map<String, dynamic> map) {
     return ChatModel(
-      uuid: map['uuid'] as String,
-      isInvited: map['isInvited'] as bool,
-      contents:
-          ChatContentModel.fromMap(map['contents'] as Map<String, dynamic>),
+      chatKey: map['chatKey'] as String,
+      message: map['message'] as String,
+      senderEmail: map['senderEmail'] as String,
+      createdAt: map['createdAt'] as int,
     );
   }
 

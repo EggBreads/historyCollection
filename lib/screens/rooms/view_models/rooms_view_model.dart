@@ -1,80 +1,65 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:historycollection/api/rooms/rooms_api_service.dart';
 import 'package:historycollection/screens/rooms/models/room_model.dart';
 import 'package:historycollection/screens/rooms/repos/rooms_repository.dart';
-import 'package:historycollection/utils/databse.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class RoomsViewModel extends AsyncNotifier<List<RoomModel>> {
-  final RoomRepository _repository = RoomRepository();
+class RoomsViewModel extends AutoDisposeAsyncNotifier<void> {
+  late final RoomRepository _repository;
 
   // API 대신 사용중
-  final SharedPreferences _preferences = SharedPrefs().getSharedPrefs;
+  // final SharedPreferences _preferences = SharedPrefs().getSharedPrefs;
   // static const storageKey = "SAVED_ROOMS";
 
-  Future<bool> createRoom(RoomModel model) async {
+  Future<void> createRoom(RoomModel model) async {
     state = const AsyncValue.loading();
 
-    List<String>? strRooms = _preferences.getStringList(
-      RoomRepository.storageKey,
-    );
-    if (strRooms == null) {
-      strRooms = [];
-      strRooms.add(model.toJson());
-      return true;
-    }
-
-    int sizes = strRooms
-        .where((room) {
-          RoomModel saveRoom = RoomModel.fromJson(room);
-          return saveRoom.chatKey == model.chatKey;
-        })
-        .map(
-          (room) => RoomModel.fromJson(room),
-        )
-        .toList()
-        .length;
-
-    if (sizes > 0) {
-      return false;
-    }
-
-    _repository.setRoom(model);
-
-    state = AsyncValue.data(_repository.getRooms);
-
-    return true;
+    AsyncValue.guard(() async {
+      await _repository.createRoom(model);
+    });
   }
 
+  List<RoomModel> getRoomList(String? email) {
+    // final auth = ref.read(authProvider.notifier);
+    return _repository.getRooms(email);
+  }
+
+  Future<RoomModel?> getRoom(String chatKey) async {
+    return _repository.getRoom(chatKey);
+  }
+
+  Future<void> joinRoom(RoomModel room) async {
+    await _repository.setRoom(room);
+  }
+
+  // Stream<List<RoomModel>> getRoomsStream() async* {
+  //   while (true) {
+  //     await Future.delayed(const Duration(seconds: 1));
+
+  //     yield getRoomList();
+  //   }
+  // }
+
   @override
-  FutureOr<List<RoomModel>> build() async {
-    // TODO: implement build
-    // throw UnimplementedError();
-    // RoomsApiService
+  FutureOr<void> build() async {
+    _repository = RoomRepository();
 
-    // state = const AsyncValue.loading();
-
-    List<RoomModel> list = [];
-
-    final strRooms = _preferences.getStringList(
-      RoomRepository.storageKey,
-    );
-
-    if (strRooms == null) {
-      list = await RoomsApiService.getAreaItems();
-      return list;
-    }
-
-    list = _repository.getRooms;
-
-    return list;
+    // return getRoomList();
   }
 }
 
-final roomsProvider = AsyncNotifierProvider<RoomsViewModel, List<RoomModel>>(
+final roomsProvider = AsyncNotifierProvider.autoDispose<RoomsViewModel, void>(
   () {
     return RoomsViewModel();
   },
 );
+
+final roomsFormProvider = StateProvider<Map<String, dynamic>>((ref) => {});
+
+// final roomsStreamProvider = StreamProvider.autoDispose<List<RoomModel>>(
+//   (ref) {
+//     // final chatRef = ref.read(roomsProvider.notifier);
+
+//     return joinStreamProvider;
+//   },
+// );

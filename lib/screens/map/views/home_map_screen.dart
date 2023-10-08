@@ -6,7 +6,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:historycollection/Constants/gaps.dart';
 import 'package:historycollection/Constants/sizes.dart';
 import 'package:historycollection/screens/map/models/map_position_model.dart';
-import 'package:historycollection/screens/map/models/marker_model.dart';
 import 'package:historycollection/screens/map/view_models/map_view_model.dart';
 import 'package:historycollection/screens/map/widgets/google_map.dart';
 
@@ -32,7 +31,6 @@ class HomeMapScreenState extends ConsumerState<HomeMapScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _initGoogleMap();
   }
@@ -70,17 +68,17 @@ class HomeMapScreenState extends ConsumerState<HomeMapScreen> {
         );
   }
 
-  FutureProvider<Map<MarkerId, Marker>> _getMarkersProvider(
-      List<MarkerModel> data) {
-    final markerProvider = FutureProvider<Map<MarkerId, Marker>>(
-      (ref) async {
-        final map = ref.read(mapProvider.notifier).getMarkers(data);
-        return map;
-      },
-    );
+  // FutureProvider<Map<MarkerId, Marker>> _getMarkersProvider(
+  //     List<MarkerModel> data) {
+  //   final markerProvider = FutureProvider<Map<MarkerId, Marker>>(
+  //     (ref) async {
+  //       final map = ref.read(mapProvider.notifier).getMarkers(data);
+  //       return map;
+  //     },
+  //   );
 
-    return markerProvider;
-  }
+  //   return markerProvider;
+  // }
 
   Future<Position> _getCurrentPosition() async {
     return await Geolocator.getCurrentPosition(
@@ -89,14 +87,14 @@ class HomeMapScreenState extends ConsumerState<HomeMapScreen> {
     );
   }
 
-  Future<void> _goToPosition(Position p) async {
-    final GoogleMapController controller = await _controller.future;
-    CameraPosition carmeraPosition = CameraPosition(
-      target: LatLng(p.latitude, p.longitude),
-      zoom: 14.00,
-    );
-    controller.animateCamera(CameraUpdate.newCameraPosition(carmeraPosition));
-  }
+  // Future<void> _goToPosition(Position p) async {
+  //   final GoogleMapController controller = await _controller.future;
+  //   CameraPosition carmeraPosition = CameraPosition(
+  //     target: LatLng(p.latitude, p.longitude),
+  //     zoom: 14.00,
+  //   );
+  //   controller.animateCamera(CameraUpdate.newCameraPosition(carmeraPosition));
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -112,8 +110,13 @@ class HomeMapScreenState extends ConsumerState<HomeMapScreen> {
                 child: Text("Could not load videos: $error"),
               ),
               data: (data) {
-                final mapMarks =
-                    ref.read(mapProvider.notifier).getMarkers(data.markerList);
+                // Map<MarkerId, Marker> mapMarks = {};
+
+                // if (data.markerList.isNotEmpty) {
+                // mapMarks = ref
+                //     .read(mapProvider.notifier)
+                //     .getMarkers(data.markerList);
+                // }
                 return SizedBox(
                   width: width,
                   child: !_hasLocationPermission
@@ -135,12 +138,21 @@ class HomeMapScreenState extends ConsumerState<HomeMapScreen> {
                       : Stack(
                           alignment: Alignment.center,
                           children: [
-                            Positioned(
-                              child: GoogleMapWidget(
-                                kPosition: _kInitPosition,
-                                markers: Set<Marker>.of(mapMarks.values),
-                                gController: _controller,
-                              ),
+                            FutureBuilder(
+                              future: ref
+                                  .read(mapProvider.notifier)
+                                  .getMarkers(data.markerList),
+                              builder: (context, snapshot) {
+                                return Positioned(
+                                  child: GoogleMapWidget(
+                                    kPosition: _kInitPosition,
+                                    markers: snapshot.data == null
+                                        ? {}
+                                        : Set<Marker>.of(snapshot.data!.values),
+                                    gController: _controller,
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),

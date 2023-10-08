@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:historycollection/api/map/map_api_service.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import 'package:historycollection/screens/map/repos/map_repository.dart';
 
 class MapViewModel extends AsyncNotifier<MapModel> {
   final MapRepository _repository = MapRepository();
+  Map<MarkerId, Marker> markers = {};
 
   void setMapMarker(MarkerModel model) {
     state = const AsyncValue.loading();
@@ -41,15 +43,22 @@ class MapViewModel extends AsyncNotifier<MapModel> {
     );
   }
 
-  Map<MarkerId, Marker> getMarkers(List<MarkerModel> markerList) {
+  MapPosition get getThisPosition {
+    return _repository.getThisPosition;
+  }
+
+  Future<Map<MarkerId, Marker>> getMarkers(List<MarkerModel> markerList) async {
     Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
     if (markerList.isNotEmpty) {
-      List<Marker> list = markerList.asMap().values.map((obj) {
+      List<Future<Marker>> list = markerList.asMap().values.map((obj) async {
         // Map<MarkerId, Marker> markerMap = <MarkerId, Marker>{};
         MarkerId markerId = MarkerId(obj.markerId);
 
-        // Uint8List bytes = await _getImgBytes(obj.winIcon);
+        Uint8List? bytes = await _getImgBytes(obj.winIcon);
+// await  ImageConfiguration((size: Size(48, 48)), 'assets/my_icon.png'));
+        // ImageConfiguration(bundle: AssetBundl);
+        // BitmapDescriptor.fromAssetImage();
 
         Marker marker = Marker(
           markerId: markerId,
@@ -57,11 +66,13 @@ class MapViewModel extends AsyncNotifier<MapModel> {
             obj.mapPosition.lat,
             obj.mapPosition.lng,
           ),
-          icon:
-              // BitmapDescriptor.fromBytes(bytes),
-              BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueYellow,
-          ),
+          icon: bytes == null
+              ? BitmapDescriptor.defaultMarker
+              : BitmapDescriptor.fromBytes(bytes),
+
+          //   BitmapDescriptor.defaultMarkerWithHue(
+          // BitmapDescriptor.hueYellow,
+          // ),
           infoWindow: InfoWindow(
             title: obj.title,
             snippet: obj.snippet,
@@ -73,7 +84,7 @@ class MapViewModel extends AsyncNotifier<MapModel> {
       }).toList();
 
       for (var obj in list) {
-        Marker m = obj;
+        Marker m = await obj;
         markers[m.markerId] = m;
       }
     }
@@ -81,36 +92,35 @@ class MapViewModel extends AsyncNotifier<MapModel> {
     return markers;
   }
 
-  Future<Uint8List> _getImgBytes(String imgUrl) async {
-    // Uint8List bytes = (await NetworkAssetBundle(
-    //   Uri.parse(imgUrl),
-    // ).load(
-    //   "",
-    // ))
-    //     .buffer
-    //     .asUint8List();
+  Future<Uint8List?> _getImgBytes(String imgUrl) async {
+    Uint8List? resizedImg;
+    try {
+      final ByteData imageData =
+          await NetworkAssetBundle(Uri.parse(imgUrl)).load("");
 
-    final ByteData imageData =
-        await NetworkAssetBundle(Uri.parse(imgUrl)).load("");
-    final Uint8List bytes = imageData.buffer.asUint8List();
+      final Uint8List bytes = imageData.buffer.asUint8List();
 
-    // BitmapDescriptor d = await BitmapDescriptor.fromAssetImage(
-    //   ImageConfiguration(),
-    //   "assets/images/bike.png",
-    // );
+      IMG.Image? img = IMG.decodeImage(bytes);
+      IMG.Image resized = IMG.copyResize(img!, width: 80, height: 80);
+      resizedImg = Uint8List.fromList(
+        IMG.encodePng(resized),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return resizedImg;
+    }
 
-    IMG.Image? img = IMG.decodeImage(bytes);
-    IMG.Image resized = IMG.copyResize(img!, width: 80, height: 80);
-    Uint8List resizedImg = Uint8List.fromList(
-      IMG.encodePng(resized),
-    );
+    return (resizedImg);
+  }
 
-    return resizedImg;
+  Future<String> getAddress(double lat, lng) async {
+    return await _repository.getAddress(lat, lng);
   }
 
   @override
   FutureOr<MapModel> build() async {
-    // TODO: implement build
     // throw UnimplementedError();
     List<MarkerModel> markers = [];
 
@@ -128,6 +138,8 @@ class MapViewModel extends AsyncNotifier<MapModel> {
         _repository.setMarkers(obj);
       }
     }
+
+    // _getImgBytes("https://www.fluttercampus.com/img/banner.png");
 
     MapPosition position = _repository.getThisPosition;
 

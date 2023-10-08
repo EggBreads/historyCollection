@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:historycollection/screens/map/models/map_position_model.dart';
 import 'package:historycollection/screens/map/models/marker_model.dart';
 import 'package:historycollection/utils/databse.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class MapRepository {
   static const storageMarkersKey = "SAVED_MARKERS";
@@ -81,5 +86,44 @@ class MapRepository {
     return MapPosition.fromJson(
       strPosition,
     );
+  }
+
+  Future<String> getAddress(double lat, lng) async {
+    final client = http.Client();
+    // String uri =
+    // "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDx1jM_62He-G4ubC8-uPPlAS3n5fkMCk8&latlng=$lat,$lng&language=ko";
+    // final url = Uri.parse(uri);
+    String latlng = "$lat,$lng";
+    Map<String, String> params = {
+      "key": "AIzaSyDx1jM_62He-G4ubC8-uPPlAS3n5fkMCk8",
+      "latlng": latlng,
+      "language": "ko",
+    };
+    final url = Uri.https(
+      "maps.googleapis.com",
+      "/maps/api/geocode/json",
+      params,
+    );
+
+    final res = await client.get(url).onError((error, stackTrace) {
+      if (kDebugMode) {
+        print(error);
+      }
+      return Response("err", 401);
+      // return error;
+    });
+
+    if (res.statusCode != 200) {
+      return '';
+    }
+
+    final jsonRes = jsonDecode(res.body) as Map<String, dynamic>;
+
+    final results = jsonRes['results'];
+
+    final result = results[0];
+
+    final address = result['formatted_address'] as String;
+    return address;
   }
 }

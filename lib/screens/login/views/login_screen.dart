@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:historycollection/Constants/sizes.dart';
-import 'package:historycollection/screens/home/widgets/home_login.dart';
 import 'package:historycollection/screens/home/widgets/home_theme.dart';
+import 'package:historycollection/screens/login/widgets/home_login.dart';
 
-class HomeMain extends StatelessWidget {
-  const HomeMain({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(Sizes.size10),
+          padding: EdgeInsets.all(Sizes.size10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: const [
+            children: [
               Expanded(
                 flex: 3,
                 child: HomeTheme(),

@@ -1,132 +1,40 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:historycollection/screens/chats/models/chat_model.dart';
-import 'package:historycollection/screens/chats/models/chats_room_model.dart';
-import 'package:historycollection/utils/databse.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:historycollection/utils/databse.dart';
+
 class ChatsRepository {
-  static const chatsKey = "SAVED_CHATS";
-  static const chatUserKey = "CHATS_NICKNAME";
-  // static const chatsOtherstKey = "SAVED_INTEREST";
+  String chatKey;
+
+  ChatsRepository({
+    required this.chatKey,
+  });
 
   final SharedPreferences _preferences = SharedPrefs().getSharedPrefs;
 
-  Future<void> initChats(String nickName) async {
-    await _preferences.setString(chatUserKey, nickName);
-  }
+  Future<void> saveChatMessage(ChatModel chat) async {
+    List<String>? list = _preferences.getStringList(chatKey);
 
-  Future<String> get getNickName async {
-    String? chatUser = _preferences.getString(chatUserKey);
-
-    if (chatUser == null || chatUser.isEmpty) {
-      return "";
-    }
-
-    return chatUser;
-  }
-
-  Future<void> addChatOnRoom(ChatModel chat, String roomKey) async {
-    List<String> chatsRoom = _preferences.getStringList(chatsKey)!;
-
-    List<String> list = chatsRoom.map((room) {
-      ChatsRoomModel result = ChatsRoomModel.fromJson(room);
-
-      if (result.roomKey == roomKey) {
-        result.chat.add(chat);
-        return result.toJson();
-      }
-      return room;
-    }).toList();
-
-    await _preferences.setStringList(
-      chatsKey,
-      [
-        ...list,
-      ],
-    );
-  }
-
-  Future<void> setRoomOnUser(ChatsRoomModel chatRoom) async {
-    List<String>? chatsRoom = _preferences.getStringList(chatsKey);
-
-    if (chatsRoom == null || chatsRoom.isEmpty) {
-      await _preferences.setStringList(
-        chatsKey,
-        [
-          chatRoom.toJson(),
-        ],
-      );
+    if (list == null) {
+      await _preferences.setStringList(chatKey, [chat.toJson()]);
       return;
     }
 
-    final result = chatsRoom.map((room) {
-      final roomModel = ChatsRoomModel.fromJson(room);
+    await _preferences.setStringList(chatKey, [...list, chat.toJson()]);
+  }
 
-      if (roomModel.roomKey == chatRoom.roomKey) {
-        return chatRoom.toJson();
-      }
+  List<ChatModel> get getChats {
+    List<String>? chatsRoom = _preferences.getStringList(chatKey);
 
-      return room;
-    });
-
-    if (result.isNotEmpty) {
-      await _preferences.setStringList(
-        chatsKey,
-        [
-          ...result,
-        ],
-      );
-      return;
+    if (chatsRoom == null) {
+      return [];
     }
 
-    await _preferences.setStringList(
-      chatsKey,
-      [
-        ...result,
-        chatRoom.toJson(),
-      ],
-    );
+    return chatsRoom.map((e) => ChatModel.fromJson(e)).toList();
   }
-
-  List<ChatsRoomModel> get getChatsRoomList {
-    List<String> chatsRoom = _preferences.getStringList(chatsKey)!;
-
-    return chatsRoom.map((e) => ChatsRoomModel.fromJson(e)).toList();
-  }
-
-  Future<bool> hasRoom(String roomKey) async {
-    List<String>? chatsRoom = _preferences.getStringList(chatsKey);
-
-    if (chatsRoom == null || chatsRoom.isEmpty) {
-      return false;
-    }
-
-    List<String> list = chatsRoom.where((room) {
-      ChatsRoomModel result = ChatsRoomModel.fromJson(room);
-      return result.roomKey == roomKey;
-    }).toList();
-
-    return list.isNotEmpty;
-  }
-
-  //   Future<void> setChatUser(ChatsRoomModel chatRoom) async {
-  //   List<String>? chatsRoom = _preferences.getStringList(chatsKey);
-
-  //   if (chatsRoom == null || chatsRoom.isEmpty) {
-  //     await _preferences.setStringList(
-  //       chatsKey,
-  //       [
-  //         chatRoom.toJson(),
-  //       ],
-  //     );
-  //     return;
-  //   }
-
-  //   await _preferences.setStringList(
-  //     chatsKey,
-  //     [
-  //       ...chatsRoom,
-  //       chatRoom.toJson(),
-  //     ],
-  //   );
-  // }
 }
+
+final chatProvider = Provider.family<ChatsRepository, String>(
+    (ref, arg) => ChatsRepository(chatKey: arg));

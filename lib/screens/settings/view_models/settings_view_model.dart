@@ -20,7 +20,6 @@ class SettingsViewModel extends Notifier<SettingsModel> {
 
   @override
   SettingsModel build() {
-    // TODO: implement build
     // throw UnimplementedError();
     return _repository.getSettings;
   }

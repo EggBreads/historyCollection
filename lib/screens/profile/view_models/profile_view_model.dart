@@ -11,7 +11,6 @@ class ProfileViewModel extends Notifier<ProfileModel> {
 
   @override
   ProfileModel build() {
-    // TODO: implement build
     // throw UnimplementedError();
     final strProfile = _preferences.getString(ProfileRepository.storageKey);
     if (strProfile == null) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:historycollection/Constants/sizes.dart';
-import 'package:historycollection/screens/rooms/view_models/rooms_view_model.dart';
+import 'package:historycollection/Constants/gaps.dart';
 import 'package:historycollection/screens/rooms/widgets/room_chat_info.dart';
+import 'package:historycollection/webrtc/providers/socket_client_provider.dart';
 
 class RoomsScreen extends ConsumerStatefulWidget {
   const RoomsScreen({super.key});
@@ -16,30 +16,29 @@ class RommsScreenState extends ConsumerState<RoomsScreen> {
   // String _searchWords = '';
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     // _keyDownSearch();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     // searchWidgets.clear();
     // _searchWords = "";
   }
 
-  // void _keyDownSearch() {
-  //   setState(
-  //     () {
-  //       searchWidgets = List.generate(
-  //         5,
-  //         (index) {
-  //           // return const SearchList();
-  //           return const RoomChatInfo();
-  //         },
-  //       );
-  //     },
+  // void _createRoomTap() async {
+  //   final roomsRef = ref.read(roomsProvider.notifier);
+
+  //   await roomsRef.createRoom(
+  //     RoomModel(
+  //       chatKey: "test1",
+  //       title: "테스트룸",
+  //       subTitle: "테스트룸 서브타이틀",
+  //       userName: "mds1262@naver.com",
+  //       maxCnt: 3,
+  //       joiners: ["mds1262@naver.com"],
+  //     ),
   //   );
   // }
 
@@ -49,10 +48,18 @@ class RommsScreenState extends ConsumerState<RoomsScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Center(
-            child: Text("Rooms"),
+            child: Text("채팅방전체목록"),
           ),
+          // actions: [
+          //   IconButton(
+          //     onPressed: _createRoomTap,
+          //     icon: const FaIcon(
+          //       FontAwesomeIcons.plus,
+          //     ),
+          //   ),
+          // ],
         ),
-        body: ref.watch(roomsProvider).whenOrNull(
+        body: ref.watch(roomStreamProvider).whenOrNull(
               loading: () => const Center(
                 child: CircularProgressIndicator.adaptive(),
               ),
@@ -61,28 +68,25 @@ class RommsScreenState extends ConsumerState<RoomsScreen> {
               ),
               data: (data) {
                 return SafeArea(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: Sizes.size20,
-                        horizontal: Sizes.size10,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // SearchingBar(
-                          //   onChangeSearch: _onChangeSearch,
-                          //   onTapSearch: _onTapSearch,
-                          // ),
-                          ...data.map(
-                            (room) => RoomChatInfo(room: room),
+                  child: data.isEmpty
+                      ? const Center(
+                          child: Text("근처에 참여할 모임이 없어요......"),
+                        )
+                      : SingleChildScrollView(
+                          child: ListView.separated(
+                            // itemExtent: ,
+                            scrollDirection: Axis.vertical,
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            separatorBuilder: (context, index) => Gaps.v10,
+                            itemCount: data.length,
+                            itemBuilder: (context, index) {
+                              return RoomChatInfo(
+                                room: data[index],
+                              );
+                            },
                           ),
-                          // ),
-                          // SearchList(),
-                        ],
-                      ),
-                    ),
-                  ),
+                        ),
                 );
               },
             ));

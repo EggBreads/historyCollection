@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:historycollection/Constants/gaps.dart';
 import 'package:historycollection/Constants/sizes.dart';
 import 'package:historycollection/utils/app_theme.dart';
 
 class AreaPersistentTabar extends SliverPersistentHeaderDelegate {
-  final int tabSize;
+  final List<String> areaItems;
 
   AreaPersistentTabar({
-    required this.tabSize,
+    required this.areaItems,
   });
 
   _onTabbar(val) {
@@ -17,7 +16,6 @@ class AreaPersistentTabar extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    // TODO: implement build
     final selectedIdx = DefaultTabController.of(context).index;
     final isDark = isDarkMod(context);
     return FractionallySizedBox(
@@ -40,13 +38,14 @@ class AreaPersistentTabar extends SliverPersistentHeaderDelegate {
           vertical: Sizes.size5,
         ),
         tabs: [
-          ...Iterable.generate(tabSize).map(
+          ...Iterable.generate(areaItems.length).map(
             (idx) {
               // test.asMap().entries.map((e) {
               //   print("test2 => $e");
               //   return e;
               // });
-              return _tabClib(context, isDark, selectedIdx == idx);
+              return _tabClib(
+                  context, areaItems[idx], isDark, selectedIdx == idx);
             },
           ),
         ],
@@ -54,7 +53,8 @@ class AreaPersistentTabar extends SliverPersistentHeaderDelegate {
     );
   }
 
-  Container _tabClib(BuildContext context, bool isDark, bool isSelected) {
+  Container _tabClib(
+      BuildContext context, String interest, bool isDark, bool isSelected) {
     return Container(
       padding: const EdgeInsets.all(
         Sizes.size5,
@@ -88,15 +88,11 @@ class AreaPersistentTabar extends SliverPersistentHeaderDelegate {
               ? (isDark ? Colors.black45 : Colors.white54)
               : (isDark ? Colors.white54 : Colors.black45),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "전체",
-            ),
-            Gaps.h5,
-            Text(
-              "123123123",
+              interest,
             ),
           ],
         ),
@@ -105,17 +101,13 @@ class AreaPersistentTabar extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  // TODO: implement maxExtent
   double get maxExtent => 80;
 
   @override
-  // TODO: implement minExtent
   double get minExtent => 80;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    // TODO: implement shouldRebuild
-    // throw UnimplementedError();
     return false;
   }
 }

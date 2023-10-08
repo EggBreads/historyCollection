@@ -62,7 +62,6 @@ class InterestViewModel extends AutoDisposeAsyncNotifier<List<InterestModel>> {
 
   @override
   FutureOr<List<InterestModel>> build() async {
-    // TODO: implement build
     // throw UnimplementedError();
     final result = _repository.getInterests;
 

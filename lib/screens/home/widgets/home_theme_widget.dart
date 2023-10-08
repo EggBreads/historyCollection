@@ -5,9 +5,13 @@ class HomeThemes extends StatelessWidget {
   const HomeThemes({
     super.key,
     required this.imgList,
+    required this.maxHeight,
+    required this.maxWidth,
   });
 
   final List<String> imgList;
+  final double maxHeight;
+  final double maxWidth;
 
   // late List<Widget> imageSliders;
 
@@ -24,7 +28,8 @@ class HomeThemes extends StatelessWidget {
                     Image.asset(
                       item,
                       fit: BoxFit.cover,
-                      width: 1000.0,
+                      width: maxWidth,
+                      height: maxHeight,
                     ),
                     // Positioned(
                     //   bottom: 0.0,
