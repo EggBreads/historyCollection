@@ -90,9 +90,6 @@ class MapRepository {
 
   Future<String> getAddress(double lat, lng) async {
     final client = http.Client();
-    // String uri =
-    // "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDx1jM_62He-G4ubC8-uPPlAS3n5fkMCk8&latlng=$lat,$lng&language=ko";
-    // final url = Uri.parse(uri);
     String latlng = "$lat,$lng";
     Map<String, String> params = {
       "key": "AIzaSyDx1jM_62He-G4ubC8-uPPlAS3n5fkMCk8",
