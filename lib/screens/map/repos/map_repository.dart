@@ -92,7 +92,7 @@ class MapRepository {
     final client = http.Client();
     String latlng = "$lat,$lng";
     Map<String, String> params = {
-      "key": "AIzaSyDx1jM_62He-G4ubC8-uPPlAS3n5fkMCk8",
+      "key": "",
       "latlng": latlng,
       "language": "ko",
     };
